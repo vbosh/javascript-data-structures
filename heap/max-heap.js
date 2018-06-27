@@ -1,57 +1,66 @@
 class MaxHeap {
     constructor() {
-        this.items = []
+        this._items = []
     }
 
     static getLeftChildIndex(parentIndex) { return 2 * parentIndex + 1 }
     static getRightChildIndex(parentIndex) { return 2 * parentIndex + 2 }
     static getParentIndex(childIndex) { return Math.floor((childIndex - 1) / 2) }
 
-    hasLeftChild(index) { return MaxHeap.getLeftChildIndex(index) < this.items.length }
-    hasRightChild(index) { return MaxHeap.getRightChildIndex(index) < this.items.length }
-    hasParent(index) { return MaxHeap.getParentIndex(index) >= this.items.length }
+    hasLeftChild(index) { return MaxHeap.getLeftChildIndex(index) < this.size() }
+    hasRightChild(index) { return MaxHeap.getRightChildIndex(index) < this.size() }
+    hasParent(index) { return MaxHeap.getParentIndex(index) >= this.size() }
 
-    leftChild(index) { return this.items[MaxHeap.getLeftChildIndex(index)] }
-    rightChild(index) { return this.items[MaxHeap.getRightChildIndex(index)] }
-    parent(index) { return this.items[MaxHeap.getParentIndex(index)] }
+    leftChild(index) { return this._items[MaxHeap.getLeftChildIndex(index)] }
+    rightChild(index) { return this._items[MaxHeap.getRightChildIndex(index)] }
+    parent(index) { return this._items[MaxHeap.getParentIndex(index)] }
+
+    size() {
+        return this._items.length
+    }
 
     swap(first, second) {
-        const temp = this.items[first]
-        this.items[first] = this.items[second]
-        this.items[second] = temp
+        const temp = this._items[first]
+        this._items[first] = this._items[second]
+        this._items[second] = temp
     }
 
     peek() {
-        if (!this.items.length) {
+        if (!this.size()) {
             return null
         }
 
-        return this.items[0]
+        return this._items[0]
     }
 
     poll() {
-        if (!this.items.length) {
+        if (!this.size()) {
             return null
         }
 
-        let item = this.items.shift()
-        this.items.unshift(this.items.pop())
+        let item = this._items.shift()
+        let last = this._items.pop()
 
-        this.sinkDown()
+        // If the array is empty, do not sinkDown
+        if (this.size()) {
+            this._items.unshift(this._items.pop())
+
+            this.sinkDown()
+        }
 
         return item
     }
 
     add(item) {
-        this.items.push(item)
+        this._items.push(item)
         this.bubbleUp()
     }
 
     bubbleUp() {
         // Start from last element, or last item in the array
-        let index = this.items.length - 1
+        let index = this.size() - 1
 
-        while(this.hasParent(index) && this.parent(index) > this.items[index]) {
+        while(this.hasParent(index) && this.parent(index) > this._items[index]) {
             this.swap(MaxHeap.getParentIndex(index), index)
 
             index = MaxHeap.getParentIndex(index)
@@ -72,7 +81,7 @@ class MaxHeap {
                 biggerChildIndex = MaxHeap.getRightChildIndex(index)
             }
 
-            if (this.items[index] > this.items[biggerChildIndex]) {
+            if (this._items[index] > this._items[biggerChildIndex]) {
                 break
             } else {
                 this.swap(index, biggerChildIndex)
